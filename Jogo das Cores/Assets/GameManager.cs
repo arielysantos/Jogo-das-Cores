@@ -1,58 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : GameManagerBase
 {
-    #region Singleton
-    public static GameManager instance;
-
-    private void Awake()
-    {
-        instance = this;
-    }
-    #endregion
-
-    int corDaVez, acertos, erros;
     public int[] sequencia;
-    [SerializeField] string[] nomes;
 
     private void Start()
     {
+        // Chama o método da classe base
         GerarSequencia();
     }
 
-    void GerarSequencia()
+    // Sobrescreve o método GerarSequencia da classe base, se necessário
+    public override void GerarSequencia()
     {
-        corDaVez = 0;
+        base.GerarSequencia();  // Chama a implementação base
 
-        sequencia = new int[Random.Range(3, nomes.Length)];
-        UIManager.instance.LimparTexto();
+        // Ajuste da lógica de geração da sequência
+        sequencia = new int[Random.Range(3, Mathf.Max(nomes.Length, 3))];
 
-        for(int i = 0; i < sequencia.Length; i++) 
+        for (int i = 0; i < sequencia.Length; i++)
         {
             sequencia[i] = Random.Range(0, nomes.Length);
             UIManager.instance.AtualizarSequencia(nomes[sequencia[i]]);
         }
     }
 
-    public void ChecarCor(int corIndex)
+    // Implementa o comportamento específico para checar a cor
+    public override void ChecarCor(int corIndex)
     {
-        if(corIndex == sequencia[corDaVez])
+        if (corIndex == sequencia[corDaVez])
         {
             corDaVez++;
-            if(corDaVez == sequencia.Length)
+            if (corDaVez == sequencia.Length)
             {
                 acertos++;
                 UIManager.instance.AtualizarAcertos(acertos);
-                GerarSequencia();
+                GerarSequencia(); // Nova sequência
             }
         }
         else
         {
             erros++;
             UIManager.instance.AtualizarErros(erros);
-            GerarSequencia();
+            GerarSequencia(); // Resetando a sequência
         }
     }
 }
