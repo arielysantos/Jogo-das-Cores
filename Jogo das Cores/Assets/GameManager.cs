@@ -6,6 +6,10 @@ using UnityEngine;
 public class GameManager : GameManagerBase
 {
     public int[] sequencia;
+    private object nomes;
+    private int erros;
+    private int acertos;
+    private int corDaVez;
 
     private void Start()
     {
