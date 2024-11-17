@@ -4,55 +4,49 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public abstract class UIManagerBase : MonoBehaviour
 {
     #region Singleton
-    public static UIManager instance;
+    public static UIManagerBase instance;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject); // Garante que a UI não será destruída ao trocar de cena
         }
-        else if(instance != this)
+        else if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // Destrói instâncias duplicadas
         }
     }
     #endregion
 
+    // Referências comuns para UI, como textos de acertos e erros
+    [SerializeField] protected TextMeshProUGUI errouTexto, acertouTexto;
 
-    [SerializeField] Button[] botoes;
-
-    [SerializeField] TextMeshProUGUI sequenciaTexto, errouTexto, acertouTexto;
-
-    private void Start()
+    // Método para atualizar acertos na UI
+    public virtual void AtualizarAcertos(int acertos)
     {
-        for (int i = 0; i < botoes.Length; i++)
+        if (acertouTexto != null)
         {
-            int x = i;
-            botoes[i].onClick.AddListener(() => GameManager.instance.ChecarCor(x));
+            acertouTexto.text = acertos.ToString();
         }
     }
 
-    public void AtualizarAcertos(int acertos)
+    // Método para atualizar erros na UI
+    public virtual void AtualizarErros(int erros)
     {
-        acertouTexto.text = acertos.ToString();
+        if (errouTexto != null)
+        {
+            errouTexto.text = erros.ToString();
+        }
     }
 
-    public void AtualizarErros(int erros)
-    {
-        errouTexto.text = erros.ToString();
-    }
+    // Método que pode ser sobrescrito para manipular outros elementos da UI
+    public abstract void LimparTexto();
 
-    public void LimparTexto()
-    {
-        sequenciaTexto.text = "";
-    }
-
-    public void AtualizarSequencia(string nomeDaCor)
-    {
-        sequenciaTexto.text = nomeDaCor + " ";
-    }
+    // Este método pode ser sobrescrito para atualizar sequências específicas
+    public abstract void AtualizarSequencia(string nomeDaCor);
 }
