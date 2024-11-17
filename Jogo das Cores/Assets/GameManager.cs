@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     int corDaVez, acertos, erros;
     public int[] sequencia;
     [SerializeField] string[] nomes;
+    private object UIManager;
 
     private void Start()
     {
