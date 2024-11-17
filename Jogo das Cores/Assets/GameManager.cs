@@ -2,57 +2,49 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public abstract class GameManagerBase : MonoBehaviour
 {
     #region Singleton
-    public static GameManager instance;
+    public static GameManagerBase instance;
 
-    private void Awake()
+    // Método de inicialização do Singleton
+    protected virtual void Awake()
     {
-        instance = this;
-    }
-    #endregion
-
-    int corDaVez, acertos, erros;
-    public int[] sequencia;
-    [SerializeField] string[] nomes;
-
-    private void Start()
-    {
-        GerarSequencia();
-    }
-
-    void GerarSequencia()
-    {
-        corDaVez = 0;
-
-        sequencia = new int[Random.Range(3, nomes.Length)];
-        UIManager.instance.LimparTexto();
-
-        for(int i = 0; i < sequencia.Length; i++) 
+        if (instance == null)
         {
-            sequencia[i] = Random.Range(0, nomes.Length);
-            UIManager.instance.AtualizarSequencia(nomes[sequencia[i]]);
-        }
-    }
-
-    public void ChecarCor(int corIndex)
-    {
-        if(corIndex == sequencia[corDaVez])
-        {
-            corDaVez++;
-            if(corDaVez == sequencia.Length)
-            {
-                acertos++;
-                UIManager.instance.AtualizarAcertos(acertos);
-                GerarSequencia();
-            }
+            instance = this;
+            DontDestroyOnLoad(gameObject); // Opcional: mantém a instância entre as cenas
         }
         else
         {
-            erros++;
-            UIManager.instance.AtualizarErros(erros);
-            GerarSequencia();
+            Destroy(gameObject); // Destrói instâncias duplicadas
         }
     }
+    #endregion
+
+    // Atributos comuns a todos os gerenciadores
+    protected int corDaVez, acertos, erros;
+    protected string[] nomes;
+
+    public virtual void GerarSequencia()
+    {
+        corDaVez = 0;
+        UIManager.instance.LimparTexto();
+    }
+
+    // Métodos comuns para manipulação de acertos e erros
+    public void AtualizarAcertos(int acertos)
+    {
+        this.acertos = acertos;
+        UIManager.instance.AtualizarAcertos(acertos);
+    }
+
+    public void AtualizarErros(int erros)
+    {
+        this.erros = erros;
+        UIManager.instance.AtualizarErros(erros);
+    }
+
+    // Método que pode ser sobrescrito nas classes derivadas
+    public abstract void ChecarCor(int corIndex);
 }
